@@ -1,0 +1,3 @@
+[submodule "artifact/Eviction-Notice"]
+	path = artifact/Eviction-Notice
+	url = https://github.com/isec-tugraz/Eviction-Notice.git

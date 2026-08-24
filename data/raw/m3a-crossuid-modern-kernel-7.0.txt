@@ -1,0 +1,76 @@
+7.0.3-arch1-2
+uid=997(m3a_attacker) gid=997(m3a_attacker) groups=997(m3a_attacker)
+uid=996(m3a_victim) gid=996(m3a_victim) groups=996(m3a_victim)
+target=/var/tmp/m3a-crossuid/target.bin owner=m3a_victim:m3a_victim mode=644 size=4096
+
+mode=flush state=miss trial=1
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=flush classification=miss cleanup=flush polls=327
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=flush state=hit trial=1
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=flush classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0
+
+mode=flush state=miss trial=2
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=flush classification=miss cleanup=flush polls=928
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=flush state=hit trial=2
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=flush classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0
+
+mode=flush state=miss trial=3
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=flush classification=miss cleanup=flush polls=339
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=flush state=hit trial=3
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=flush classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0
+
+mode=dontcache state=miss trial=1
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=dontcache classification=miss cleanup=dontcache polls=896
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=dontcache state=hit trial=1
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=dontcache classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0
+
+mode=dontcache state=miss trial=2
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=dontcache classification=miss cleanup=dontcache polls=639
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=dontcache state=hit trial=2
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=dontcache classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0
+
+mode=dontcache state=miss trial=3
+after-attacker-flush validator_uid=996 cache=0
+uid=997 mode=dontcache classification=miss cleanup=dontcache polls=815
+after-cleanup-immediate validator_uid=996 cache=0
+after-cleanup-50ms validator_uid=996 cache=0
+
+mode=dontcache state=hit trial=3
+after-attacker-flush validator_uid=996 cache=0
+after-victim-read validator_uid=996 cache=1
+uid=997 mode=dontcache classification=hit cleanup=flush
+after-cleanup validator_uid=996 cache=0

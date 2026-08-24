@@ -1,0 +1,19 @@
+mode=flush
+kernel=7.0.3-arch1-2
+target=/var/tmp/eviction-monitor-target.bin
+page-size=4096
+cpu=0
+
+state=miss samples=10000
+classify   mean=   2534.0 ns p50=2460 ns p95=2953 ns p99=4315 ns
+cleanup    mean=  12236.8 ns p50=11207 ns p95=16156 ns p99=25154 ns
+full-cycle mean=  14770.8 ns p50=13689 ns p95=18806 ns p99=28426 ns
+sampling-hz p50=73051.4 p95=53174.5 p99=35179.1
+cleanup-failures=0/10000 (0.0000%)
+
+state=hit samples=10000
+classify   mean=    273.8 ns p50=259 ns p95=336 ns p99=507 ns
+cleanup    mean=    610.1 ns p50=555 ns p95=842 ns p99=1639 ns
+full-cycle mean=    883.9 ns p50=814 ns p95=1186 ns p99=2033 ns
+sampling-hz p50=1228501.2 p95=843170.3 p99=491883.9
+cleanup-failures=0/10000 (0.0000%)

@@ -1,0 +1,22 @@
+Host ext4 loop diagnostic
+Kernel: 7.0.3-arch1-2
+Filesystem exposed to target: ext4
+No victim process is launched.
+
+$ docker run --rm --network=none --privileged ... check-monitor-ext4.sh
+page, time [s],  cache
+0000, 0.000005482, 1
+sample=1
+page, cache
+0000,  0
+sample=2
+page, cache
+0000,  1
+sample=3
+page, cache
+0000,  1
+sample=4
+page, cache
+0000,  1
+
+exit=0

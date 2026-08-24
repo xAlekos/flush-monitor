@@ -1,0 +1,36 @@
+VM delayed Monitor check
+Ubuntu 22.04.5, kernel 5.15.0-1105-kvm, ext4
+No victim read.
+
+$ create
+Warning: Permanently added '[127.0.0.1]:2222' (ED25519) to the list of known hosts.
+
+exit=0
+
+$ flush
+Warning: Permanently added '[127.0.0.1]:2222' (ED25519) to the list of known hosts.
+page, time [s],  cache
+0000, 0.000019883, 1
+
+exit=0
+
+$ monitor_1
+Warning: Permanently added '[127.0.0.1]:2222' (ED25519) to the list of known hosts.
+page, cache
+0000,  0
+
+exit=0
+
+$ delay
+Warning: Permanently added '[127.0.0.1]:2222' (ED25519) to the list of known hosts.
+
+exit=0
+
+$ monitor_2
+Warning: Permanently added '[127.0.0.1]:2222' (ED25519) to the list of known hosts.
+page, cache
+0000,  0
+
+exit=0
+
+

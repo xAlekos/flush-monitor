@@ -1,0 +1,13 @@
+primitive=upstream
+kernel=5.15.0-1105-kvm
+trials=200
+seed=6101
+p_event=0.5
+observation_window_ns=50000000
+uid=997(m6_attacker) gid=997(m6_attacker) groups=997(m6_attacker)
+uid=996(m6_victim) gid=996(m6_victim) groups=996(m6_victim)
+attacker_ground_truth_readable=no
+54c5605e3230355f0b13eeee36e6624835f903b2b6b3193d5178521cab0edae6  /tmp/victim-static
+bd9be9409171be225e3d818ffa44f470aa16a0838407a17592149722759278b6  /tmp/target.bin
+7f1b36213a7478bc39b22da0b162f41ffe5f555fd01d1c00e79aa95da5103a73  /tmp/flush
+0457245adad2b2579d84b2ab577c0faaf4e75c6fe68c2196413749eb62b98e41  /tmp/monitor-preadv2

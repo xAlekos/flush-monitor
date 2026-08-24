@@ -1,0 +1,42 @@
+Date: 2026-08-23
+Host kernel: 7.0.3-arch1-2
+Filesystem: loop-mounted ext4; image stored on the host Btrfs workspace
+Target: one 4 KiB page
+Iterations: 1000 miss cycles per method
+Validation: mincore as file owner; 50 us stabilization occurs outside timing
+
+NOWAIT|DONTCACHE (1000 miss cycles)
+full sequence mean=   5536.6 ns p50=4270 ns p95=8975 ns p99=41421 ns max=93509 ns
+classify      mean=   2193.2 ns p50=1811 ns p95=4384 ns p99=7738 ns max=35313 ns
+cleanup       mean=   3194.1 ns p50=2295 ns p95=3689 ns p99=38450 ns max=87259 ns
+total/window  mean=   5387.3 ns p50=4128 ns p95=8595 ns p99=41280 ns max=93292 ns
+polls         mean=     16.8    p50=12      p95=19      p99=223      max=331
+cleanup failures: 0/1000 (0.0000%)
+
+NOWAIT then Flush (1000 miss cycles)
+full sequence mean=   5810.2 ns p50=4626 ns p95=9915 ns p99=40547 ns max=57351 ns
+classify      mean=   2168.0 ns p50=1795 ns p95=4116 ns p99=7876 ns max=31890 ns
+cleanup       mean=   3496.8 ns p50=2696 ns p95=4237 ns p99=38265 ns max=54811 ns
+total/window  mean=   5664.8 ns p50=4489 ns p95=9715 ns p99=40410 ns max=57192 ns
+polls         mean=     16.6    p50=12      p95=19      p99=231      max=333
+cleanup failures: 0/1000 (0.0000%)
+
+Immediate Monitor->Flush race (1000 trials)
+cached after 50 us: 974/1000 (97.40%)
+late cache fill by 1 ms: 26/1000 (2.60%)
+stale fills caught before a trial: 0
+
+Definitions:
+
+- classify: first preadv2 call, ending with EAGAIN.
+- cleanup: from EAGAIN return until the page is absent again.
+- total/window: from the start of Monitor until absence is restored; this is
+  an upper bound on the contamination interval.
+- full sequence: includes the leading Flush as well.
+- NOWAIT then Flush waits until the asynchronous read is complete before the
+  final Flush. An immediate Flush is not a stable cleanup, as the race test
+  demonstrates.
+
+The backing block becomes warm during repetition, so these figures measure the
+best-case kernel/mechanism cost. Cold storage, contention and scheduling can
+make the tail substantially longer.

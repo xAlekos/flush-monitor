@@ -1,0 +1,30 @@
+RWF_NOWAIT readahead proof
+Host kernel: 7.0.3-arch1-2
+Filesystem: Btrfs
+No victim read.
+
+$ artifact/Eviction-Notice/primitives/build/flush data/m1-target.bin 0
+page, time [s],  cache
+0000, 0.000002161, 1
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat data/m1-target.bin 0
+page, cache
+0000,   0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/m1-target.bin 0
+page, cache
+0000,  0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat data/m1-target.bin 0
+page, cache
+0000,   1
+
+exit=0
+
+

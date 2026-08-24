@@ -1,0 +1,13 @@
+M2 setup
+
+Attacker:
+uid=1000(bantinus) gid=1000(bantinus) groups=1000(bantinus),965(docker),994(input),998(wheel)
+
+Victim container (same host kernel, no network):
+uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+
+Target:
+path=data/m1-target.bin size=262144 mode=644 owner=bantinus:bantinus
+TARGET                                 SOURCE                                                 FSTYPE OPTIONS
+/home/bantinus/Progetti/evictionNotice /dev/nvme0n1p2[/home/bantinus/Progetti/evictionNotice] btrfs  rw,nosuid,nodev,relatime,ssd,discard=async,space_cache=v2,subvolid=5,subvol=/
+

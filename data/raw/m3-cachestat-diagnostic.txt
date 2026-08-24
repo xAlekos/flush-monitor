@@ -1,0 +1,55 @@
+M3 cachestat diagnostic
+No victim process is launched.
+
+$ artifact/Eviction-Notice/primitives/build/flush data/m1-target.bin 0
+page, time [s],  cache
+0000, 0.000004863, 1
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat data/m1-target.bin 0  # idle 1
+page, cache
+0000,   0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat data/m1-target.bin 0  # idle 2
+page, cache
+0000,   0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat data/m1-target.bin 0  # idle 3
+page, cache
+0000,   0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/flush /usr/bin/htop 0
+page, time [s],  cache
+0000, 0.000006708, 1
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat /usr/bin/htop 0  # idle 1
+cachestat failed :(: Operation not permitted
+page, cache
+0000,   0
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat /usr/bin/htop 0  # idle 2
+page, cache
+0000,   0
+cachestat failed :(: Operation not permitted
+
+exit=0
+
+$ artifact/Eviction-Notice/primitives/build/monitor-cachestat /usr/bin/htop 0  # idle 3
+cachestat failed :(: Operation not permitted
+page, cache
+0000,   0
+
+exit=0
+
+

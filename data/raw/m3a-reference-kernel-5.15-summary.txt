@@ -1,0 +1,19 @@
+mode=reference
+kernel=5.15.0-1105-kvm
+target=/var/tmp/eviction-monitor-target.bin
+page-size=4096
+cpu=0
+
+state=miss samples=10000
+classify   mean=    215.3 ns p50=214 ns p95=223 ns p99=235 ns
+cleanup    mean=     25.5 ns p50=18 ns p95=19 ns p99=21 ns
+full-cycle mean=    240.8 ns p50=232 ns p95=241 ns p99=361 ns
+sampling-hz p50=4310344.8 p95=4149377.6 p99=2770083.1
+cleanup-failures=0/10000 (0.0000%)
+
+state=hit samples=10000
+classify   mean=    294.3 ns p50=286 ns p95=331 ns p99=514 ns
+cleanup    mean=    521.4 ns p50=491 ns p95=637 ns p99=1240 ns
+full-cycle mean=    815.7 ns p50=777 ns p95=985 ns p99=1637 ns
+sampling-hz p50=1287001.3 p95=1015228.4 p99=610873.5
+cleanup-failures=0/10000 (0.0000%)

@@ -1,0 +1,26 @@
+Date: 2026-08-23
+Host kernel: 7.0.3-arch1-2
+Filesystem under test: loop-mounted ext4 in an isolated privileged container
+Probe: preadv2(..., RWF_NOWAIT | RWF_DONTCACHE), one byte at page 0
+Observer: mincore(), run as the file owner only for validation
+
+uncached-before cache=0
+miss-probe-1 ret=-1 errno=Resource temporarily unavailable cache=0
+miss-after-50ms cache=1
+miss-probe-2 ret=1 errno=none cache=0
+miss-after-cleanup cache=0
+cached-before cache=1
+cached-probe ret=1 errno=none cache=1
+cached-after cache=1
+
+Interpretation:
+
+- The first return still classifies the initial state: EAGAIN for absent and
+  one byte for present.
+- On an absent page, the first call starts I/O and marks the new folio for
+  drop-behind. The page is transiently cached.
+- Repeating the call after I/O completion reads the marked folio and removes
+  it, restoring the initial absent state.
+- A page that was already cached is not newly marked drop-behind and remains
+  cached after the probe.
+- Btrfs on this host rejects RWF_DONTCACHE with EOPNOTSUPP.

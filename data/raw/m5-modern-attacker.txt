@@ -1,0 +1,16 @@
+primitive=flush trial=101
+uid=997 mode=flush classification=miss cleanup=flush polls=901
+primitive=flush trial=102
+uid=997 mode=flush classification=hit cleanup=flush
+primitive=flush trial=103
+uid=997 mode=flush classification=miss cleanup=flush polls=539
+primitive=flush trial=104
+uid=997 mode=flush classification=hit cleanup=flush
+primitive=dontcache trial=201
+uid=997 mode=dontcache classification=miss cleanup=dontcache polls=699
+primitive=dontcache trial=202
+uid=997 mode=dontcache classification=hit cleanup=flush
+primitive=dontcache trial=203
+uid=997 mode=dontcache classification=miss cleanup=dontcache polls=475
+primitive=dontcache trial=204
+uid=997 mode=dontcache classification=hit cleanup=flush

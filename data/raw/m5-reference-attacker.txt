@@ -1,0 +1,12 @@
+primitive=upstream trial=1
+page, cache
+0000,  0
+primitive=upstream trial=2
+page, cache
+0000,  1
+primitive=upstream trial=3
+page, cache
+0000,  0
+primitive=upstream trial=4
+page, cache
+0000,  1

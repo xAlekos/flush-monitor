@@ -1,0 +1,11 @@
+condition=reference
+kernel=5.15.0-1105-kvm
+uid=997(m5_attacker) gid=997(m5_attacker) groups=997(m5_attacker)
+uid=996(m5_victim) gid=996(m5_victim) groups=996(m5_victim)
+target_owner=m5_victim:m5_victim target_mode=644 target_size=4096
+truth_owner=m5_victim:m5_victim truth_mode=600
+attacker_ground_truth_readable=no
+54c5605e3230355f0b13eeee36e6624835f903b2b6b3193d5178521cab0edae6  /tmp/victim-static
+bd9be9409171be225e3d818ffa44f470aa16a0838407a17592149722759278b6  /tmp/target.bin
+7f1b36213a7478bc39b22da0b162f41ffe5f555fd01d1c00e79aa95da5103a73  /tmp/flush
+0457245adad2b2579d84b2ab577c0faaf4e75c6fe68c2196413749eb62b98e41  /tmp/monitor-preadv2

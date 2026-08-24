@@ -1,0 +1,32 @@
+Linux eviction-notice 7.0.3-arch1-2 #1 SMP PREEMPT_DYNAMIC Fri, 01 May 2026 15:49:22 +0000 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.5 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+/dev/vda1 ext4   rw,relatime,discard,errors=remount-ro
+2
+MemTotal 2006772 kB
+Architecture:                            x86_64
+CPU(s):                                  2
+Model name:                              11th Gen Intel(R) Core(TM) i9-11900F @ 2.50GHz
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+NAME      SIZE FSTYPE   MOUNTPOINTS
+fd0         4K          
+loop0      74M squashfs /snap/core22/2411
+loop1   115.3M squashfs /snap/lxd/40338
+loop2    50.1M squashfs /snap/snapd/27591
+sr0      1024M          
+vda         4G          
+├─vda1    3.9G ext4     /
+├─vda14     4M          
+└─vda15   106M vfat     /boot/efi
+vdb       366K iso9660  
+target=/var/tmp/eviction-monitor-target.bin size=4096 mode=644 owner=eviction:eviction
+ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7  /var/tmp/eviction-monitor-target.bin
+4c8e923acdd42d5967a7bb42433b8f51f260f0c9b634954df44d0f2b6696135b  /tmp/benchmark-monitor-resolution
+kvm-clock
