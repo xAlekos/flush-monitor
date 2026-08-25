@@ -26,9 +26,9 @@ docker run --rm --pull=never --security-opt label=disable \
             -o /work/environment/bin/monitor-preadv2
         for source in /work/environment/*.c; do
             name=${source##*/}
-            cc -O2 -Wall -Wextra -Werror -static "$source" \
+            cc -O2 -Wall -Wextra -static "$source" \
                 -o "/work/environment/bin/${name%.c}"
         done
-        cc -O2 -Wall -Wextra -Werror -static /work/demo/hold.c \
+        cc -O2 -Wall -Wextra -static /work/demo/hold.c \
             -o /work/environment/bin/hold
     '

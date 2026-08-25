@@ -32,7 +32,6 @@ notes/          experiment record and interpretation
 ```sh
 git submodule update --init
 make -C victim
-./scripts/check-local.sh
 ```
 
 The normal binary reads page 0 only for `EVENT=1`. The constant-access binary

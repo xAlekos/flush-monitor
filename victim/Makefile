@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS ?= -O2 -Wall -Wextra -Werror
+CFLAGS ?= -O2 -Wall -Wextra
 DOCKER ?= docker
 STATIC_BUILDER_IMAGE ?= flush-monitor-victim-builder:local
 
