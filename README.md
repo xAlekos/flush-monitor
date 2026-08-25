@@ -15,6 +15,10 @@ Flush page -> victim may read -> Monitor page -> cached means EVENT
 The attacker and victim use different Unix users. They share read access to the
 target inode, but the attacker cannot read the victim's ground truth.
 
+The exam presentation is available as
+[`presentation/flush-monitor.pdf`](presentation/flush-monitor.pdf), with the
+editable version in [`presentation/flush-monitor.odp`](presentation/flush-monitor.odp).
+
 ## Layout
 
 ```text
@@ -25,6 +29,7 @@ experiments/    acquisition and analysis scripts
 data/           measured raw data and derived tables
 demo/           local UI and cross-container demos
 notes/          experiment record and interpretation
+presentation/   exam slides in PDF and editable ODP format
 ```
 
 ## Build
