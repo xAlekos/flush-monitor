@@ -1,6 +1,5 @@
 #define _GNU_SOURCE
 
-#include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -11,119 +10,92 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifndef CONSTANT_ACCESS
+#define CONSTANT_ACCESS 0
+#endif
+
+static volatile unsigned char sink;
+
 static uint64_t now_ns(void)
 {
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-	return (uint64_t)ts.tv_sec * 1000000000ULL + ts.tv_nsec;
+	struct timespec time;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &time);
+	return (uint64_t)time.tv_sec * 1000000000 + time.tv_nsec;
 }
 
-static int record(FILE *log, int fd, void *buf, size_t page_size,
+static int sample(FILE *log, int fd, void *page, size_t size,
 		  uint64_t trial, int event)
 {
-	uint64_t timestamp = now_ns();
-	if (event && pread(fd, buf, page_size, 0) != (ssize_t)page_size) {
-		perror("pread");
-		return -1;
-	}
-	fprintf(log, "%" PRIu64 ",%" PRIu64 ",0,%d\n", trial, timestamp,
-		event);
-	fflush(log);
-	printf("trial=%" PRIu64 " timestamp_ns=%" PRIu64 " event=%d\n",
-	       trial, timestamp, event);
-	return 0;
-}
+	uint64_t start = now_ns();
 
-static int parse_event(const char *text, int *event)
-{
-	if (!strcmp(text, "0") || !strcmp(text, "1")) {
-		*event = text[0] - '0';
-		return 0;
+	if ((event || CONSTANT_ACCESS) && pread(fd, page, size, 0) != (ssize_t)size) {
+		perror("pread");
+		return 1;
 	}
-	return -1;
+	if (event)
+		sink ^= *(unsigned char *)page;
+
+	uint64_t duration = now_ns() - start;
+	fprintf(log, "%" PRIu64 ",%" PRIu64 ",0,%d,%" PRIu64 ",%s\n",
+		trial, start, event, duration,
+		CONSTANT_ACCESS ? "constant" : "normal");
+	fflush(log);
+	printf("trial=%" PRIu64 " event=%d duration_ns=%" PRIu64 "\n",
+	       trial, event, duration);
+	return 0;
 }
 
 static void usage(const char *name)
 {
-	fprintf(stderr,
-		"usage: %s interactive TARGET CSV\n"
-		"       %s run TARGET CSV TRIAL_ID EVENT\n",
-		name, name);
+	fprintf(stderr, "usage: %s run TARGET CSV TRIAL EVENT\n"
+			"       %s interactive TARGET CSV\n", name, name);
 }
 
 int main(int argc, char **argv)
 {
+	int run = argc == 6 && !strcmp(argv[1], "run");
 	int interactive = argc == 4 && !strcmp(argv[1], "interactive");
-	int automated = argc == 6 && !strcmp(argv[1], "run");
-	if (!interactive && !automated) {
+	if (!run && !interactive) {
 		usage(argv[0]);
 		return 2;
 	}
 
-	long page_size = sysconf(_SC_PAGESIZE);
+	size_t size = (size_t)sysconf(_SC_PAGESIZE);
 	int fd = open(argv[2], O_RDONLY);
-	if (fd == -1) {
-		perror("open target");
-		return 1;
-	}
-	struct stat target;
-	if (fstat(fd, &target) == -1 || target.st_size < page_size) {
-		fprintf(stderr, "target must contain at least one page\n");
-		return 1;
-	}
-
 	int log_fd = open(argv[3], O_WRONLY | O_CREAT | O_APPEND, 0600);
-	if (log_fd == -1) {
-		perror("open ground truth");
+	if (fd == -1 || log_fd == -1) {
+		perror("open");
 		return 1;
 	}
-	struct stat log_stat;
-	if (fstat(log_fd, &log_stat) == -1)
-		return 1;
+
+	struct stat status;
+	fstat(log_fd, &status);
 	FILE *log = fdopen(log_fd, "a");
-	if (!log)
+	void *page = malloc(size);
+	if (!log || !page)
 		return 1;
-	if (log_stat.st_size == 0)
-		fprintf(log, "trial_id,timestamp_ns,target_page,event\n");
+	if (status.st_size == 0)
+		fprintf(log, "trial_id,timestamp_ns,target_page,event,duration_ns,"
+			"access_policy\n");
 
-	void *buf = malloc(page_size);
-	if (!buf)
-		return 1;
-
-	int status = 0;
-	if (automated) {
-		char *end;
-		errno = 0;
-		uint64_t trial = strtoull(argv[4], &end, 10);
-		int event;
-		if (errno || *end || parse_event(argv[5], &event) == -1) {
-			usage(argv[0]);
-			status = 2;
-		} else if (record(log, fd, buf, page_size, trial, event) == -1) {
-			status = 1;
-		}
+	int result = 0;
+	if (run) {
+		int event = atoi(argv[5]);
+		result = sample(log, fd, page, size,
+				strtoull(argv[4], NULL, 10), event);
 	} else {
-		char line[32];
+		char line[8];
 		uint64_t trial = 1;
 		while (printf("event [0/1/q]> "), fflush(stdout),
-		       fgets(line, sizeof(line), stdin)) {
-			if (line[0] == 'q')
-				break;
-			int event;
-			line[strcspn(line, "\n")] = 0;
-			if (parse_event(line, &event) == -1) {
-				fprintf(stderr, "enter 0, 1, or q\n");
-				continue;
-			}
-			if (record(log, fd, buf, page_size, trial++, event) == -1) {
-				status = 1;
-				break;
-			}
+		       fgets(line, sizeof(line), stdin) && line[0] != 'q') {
+			if ((line[0] != '0' && line[0] != '1') ||
+			    sample(log, fd, page, size, trial++, line[0] - '0'))
+				result = 1;
 		}
 	}
 
-	free(buf);
+	free(page);
 	fclose(log);
 	close(fd);
-	return status;
+	return result;
 }

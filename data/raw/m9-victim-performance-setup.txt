@@ -1,0 +1,5 @@
+kernel=7.2.0-flushmon
+trials_per_policy=100000
+seed=9109
+events=exactly_balanced
+cache_state=warm

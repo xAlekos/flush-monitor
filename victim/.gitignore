@@ -1,4 +1,5 @@
 /victim
+/victim-constant
 /victim-static
-/target.bin
+/victim-constant-static
 /*.csv

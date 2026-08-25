@@ -1,0 +1,7 @@
+mode=dontcache
+kernel=7.2.0-flushmon
+trials_per_interval=10000
+seed=8108
+intervals_us=800,825,850
+attacker_cpu=0
+victim_cpu=1

@@ -1,6 +1,4 @@
 FROM ubuntu:24.04
 
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        cloud-image-utils qemu-system-x86 qemu-utils \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends qemu-system-x86 \
+	&& rm -rf /var/lib/apt/lists/*

@@ -27,6 +27,4 @@ vda         4G
 └─vda15   106M vfat     /boot/efi
 vdb       366K iso9660  
 target=/var/tmp/eviction-monitor-target.bin size=4096 mode=644 owner=eviction:eviction
-ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7  /var/tmp/eviction-monitor-target.bin
-4c8e923acdd42d5967a7bb42433b8f51f260f0c9b634954df44d0f2b6696135b  /tmp/benchmark-monitor-resolution
 kvm-clock

@@ -1,0 +1,18 @@
+Modern VM smoke test
+date=2026-08-24
+guest=Ubuntu Jammy
+filesystem=ext4
+kernel=7.2.0-flushmon
+source=linux-7.2.tar.xz
+source_sha256=f9fef3d14c0df53819026f4be74459835c2a0b0dcbf5b5bbd9ea19f0829402b3
+
+legacy monitor after Flush=0
+legacy cache state after 50 ms=1
+wait+Flush miss classification=miss
+wait+Flush cache after cleanup=0
+RWF_DONTCACHE miss classification=miss
+RWF_DONTCACHE cache after miss cleanup=0
+RWF_DONTCACHE hit classification=hit
+RWF_DONTCACHE cache after hit cleanup=0
+static victim EVENT=1 succeeded
+cache after victim EVENT=1=1

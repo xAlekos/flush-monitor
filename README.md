@@ -1,71 +1,104 @@
 # flush-monitor
 
-## Controlled victim
+Small academic reproduction of the Flush+Monitor page-cache side channel from
+the NDSS 2026 paper *Eviction Notice*. The project contains a one-page victim,
+the original artifact as a pinned submodule, two Monitor cycles for current
+Linux kernels, the measurement scripts and a constant-access mitigation.
 
-Build the M4 victim and its one-page disk-backed target:
+The experiment asks one question: did the victim access a shared file page
+during the observation window?
+
+```text
+Flush page -> victim may read -> Monitor page -> cached means EVENT
+```
+
+The attacker and victim use different Unix users. They share read access to the
+target inode, but the attacker cannot read the victim's ground truth.
+
+## Layout
+
+```text
+artifact/       original Eviction Notice code
+victim/         normal and constant-access victim
+environment/    modern Monitor, sweep worker and fixed VM launcher
+experiments/    acquisition and analysis scripts
+data/           measured raw data and derived tables
+demo/           local UI and cross-container demos
+notes/          experiment record and interpretation
+```
+
+## Build
 
 ```sh
+git submodule update --init
 make -C victim
+./scripts/check-local.sh
 ```
 
-Run one automated trial:
+The normal binary reads page 0 only for `EVENT=1`. The constant-access binary
+performs the same `pread` for both events and only uses the byte for `EVENT=1`.
 
 ```sh
-./victim/victim run victim/target.bin victim/ground-truth.csv 1 0
-./victim/victim run victim/target.bin victim/ground-truth.csv 2 1
+./victim/victim run victim/target.bin /tmp/truth.csv 1 0
+./victim/victim-constant run victim/target.bin /tmp/truth-constant.csv 1 0
 ```
 
-Or use the interactive demo:
+Guest binaries are static because the host and VM use different glibc versions:
 
 ```sh
-./victim/victim interactive victim/target.bin victim/ground-truth.csv
+make -C victim static-container
+./environment/build-guest-tools.sh
 ```
 
-`EVENT=1` reads exactly page 0 with one page-sized `pread`; `EVENT=0` does not
-read the target. Ground truth is written separately with mode `0600` as
-`trial_id,timestamp_ns,target_page,event`.
-
-M4 validation evidence is in `data/raw/m4-cache-validation.txt` and
-`data/raw/m4-ground-truth.csv`.
-
-## Controlled detection
-
-M5 uses the same static victim and one-page target in the matched VMs:
+## Cross-container demo
 
 ```sh
-make -C victim static
-./environment/vm/start.sh reference   # upstream Monitor on kernel 5.15
-./environment/vm/start.sh modern      # both modern Monitors on kernel 7.0
+./demo/cross-container.sh
 ```
 
-`environment/run-m5-guest.sh` is the guest-side reproducibility runner.  For a
-two-terminal trial after provisioning `/var/tmp/m5`, run Flush in the attacker
-terminal, one victim action in the other terminal, then the appropriate
-Monitor:
+The script runs an attacker and a victim container at the same time. Both have
+no network, no capabilities and a read-only mount of the same target. Only the
+victim receives the ground-truth mount.
+
+Expected output:
+
+```text
+POLICY     EVENT   OBSERVATION
+normal     0       miss
+normal     1       hit
+constant   0       hit
+constant   1       hit
+```
+
+Containers share the host kernel and page cache, so a shared inode remains a
+shared side channel. This demo uses the modern wait+Flush Monitor because the
+host filesystem is Btrfs; `RWF_DONTCACHE` is not supported there.
+
+The separate UI-redressing demonstration is intentionally small:
 
 ```sh
-# attacker
-sudo -u m5_attacker /tmp/flush /var/tmp/m5/target.bin 0
-
-# victim: final argument 0 is NO-EVENT, 1 is EVENT
-sudo -u m5_victim /tmp/victim-static run /var/tmp/m5/target.bin \
-  /var/tmp/m5/ground-truth.csv 1 1
-
-# attacker, reference kernel
-sudo -u m5_attacker /tmp/monitor-preadv2 /var/tmp/m5/target.bin 0
-
-# attacker, modern kernel: select one
-sudo -u m5_attacker /tmp/monitor-modern-once flush /var/tmp/m5/target.bin
-sudo -u m5_attacker /tmp/monitor-modern-once dontcache /var/tmp/m5/target.bin
+cc -O2 demo/ui-attacker.c -o /tmp/ui-attacker
+cc -O2 demo/ui-victim.c -o /tmp/ui-victim
 ```
 
-The reference primitive and both modern alternatives each classified two
-EVENT and two NO-EVENT trials correctly. Raw attacker output, separate victim
-ground truth, and access-control manifests are in `data/raw/m5-*`.
+It requires Zenity. Run the attacker first and the victim in another terminal.
 
-## Randomized trials
+## Fixed VMs
 
-M6 is driven inside each guest by:
+The formal measurements use Ubuntu Jammy/ext4 guests with Linux
+`5.15.0-187-generic` and `7.2.0-flushmon`. The repository does not download or
+install operating systems. The fixed local images are described in
+`environment/vm/README.md` and started with:
+
+```sh
+docker build -t eviction-notice-qemu:local environment/vm
+./environment/vm/start.sh modern
+```
+
+## Experiments
+
+The 50 ms randomized campaign runs inside a VM after copying the static
+binaries, target and `experiments/run_trials.py` to `/tmp`:
 
 ```sh
 sudo python3 /tmp/run_trials.py upstream 200 6101
@@ -73,19 +106,55 @@ sudo python3 /tmp/run_trials.py flush 200 6101
 sudo python3 /tmp/run_trials.py dontcache 200 6101
 ```
 
-The runner is `experiments/run_trials.py`. All conditions use the same 200-bit
-random sequence and a verified 50 ms observation barrier. Each produces a
-separate attacker CSV and victim ground-truth CSV under `data/raw/m6-*`.
+Adding the victim policy produces the balanced before/after mitigation runs:
 
-## Baseline metrics
+```sh
+sudo python3 /tmp/run_trials.py flush 200 9109 normal
+sudo python3 /tmp/run_trials.py flush 200 9109 constant
+sudo python3 /tmp/run_trials.py dontcache 200 9109 normal
+sudo python3 /tmp/run_trials.py dontcache 200 9109 constant
+```
 
-Reproduce all M7 processed outputs from the raw M6 data with:
+The observation-window sweep uses persistent workers pinned to the two guest
+CPUs. With `window-sweep-worker` and `target.bin` in `/tmp`:
+
+```sh
+sudo SWEEP_OUTPUT=/tmp/sweep python3 /tmp/sweep_interval.py \
+    flush 10000 8108 800 825 850 900
+```
+
+Regenerate the tables and plot from the stored raw data:
 
 ```sh
 python3 experiments/analyze.py data/raw data/processed
+python3 experiments/analyze_sweep.py data/raw data/processed plots
+python3 experiments/analyze_mitigation.py data/raw data/processed
 ```
 
-In the controlled baseline, each primitive produced TP=103, TN=97, FP=0 and
-FN=0: accuracy, precision, recall and F1 are 1.0, while FPR and FNR are 0.0.
-See `data/processed/baseline_metrics.csv`,
-`baseline_confusion_matrix.csv`, and `baseline_timeline.csv`.
+The warm victim benchmark is independent of attacker eviction:
+
+```sh
+python3 experiments/benchmark_victim.py TARGET NORMAL CONSTANT 100000 9109 RAW_DIR
+```
+
+## Results
+
+- All three 50 ms baseline conditions classified 200/200 trials correctly.
+- On Linux 7.2 the minimum confirmed window is 850 µs for wait+Flush and
+  825 µs for `RWF_DONTCACHE`.
+- Constant access changes the attack from one bit of mutual information to
+  zero for both modern Monitors.
+- The warm dummy read adds 380.73 ns to `EVENT=0`; `EVENT=1` is unchanged
+  within measurement noise.
+
+The compact outputs are `data/processed/baseline_metrics.csv`,
+`m8-best-window.csv`, `m9-security-metrics.csv` and
+`m9-victim-overhead.csv`. Methodology and caveats are in
+`notes/experiment.md`.
+
+## Limits
+
+This is a controlled one-page local experiment, not a general exploit. The
+modern Monitors restore the cache state only after transient contamination.
+`RWF_DONTCACHE` depends on filesystem support, and constant access protects
+only code paths whose observable page accesses can be equalized.

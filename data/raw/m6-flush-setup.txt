@@ -1,13 +1,6 @@
 primitive=flush
-kernel=7.0.3-arch1-2
+access_policy=normal
+kernel=7.2.0-flushmon
 trials=200
 seed=6101
-p_event=0.5
 observation_window_ns=50000000
-uid=997(m6_attacker) gid=997(m6_attacker) groups=997(m6_attacker)
-uid=996(m6_victim) gid=996(m6_victim) groups=996(m6_victim)
-attacker_ground_truth_readable=no
-54c5605e3230355f0b13eeee36e6624835f903b2b6b3193d5178521cab0edae6  /tmp/victim-static
-bd9be9409171be225e3d818ffa44f470aa16a0838407a17592149722759278b6  /tmp/target.bin
-7f1b36213a7478bc39b22da0b162f41ffe5f555fd01d1c00e79aa95da5103a73  /tmp/flush
-b2212a62138827f56984ec35e2fc712dbc351f389b38064c91e0a968d3a48ff4  /tmp/monitor-modern-once

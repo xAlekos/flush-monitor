@@ -3,5 +3,3 @@
 bin/
 vm/id_ed25519
 vm/id_ed25519.pub
-vm/meta-data
-vm/user-data

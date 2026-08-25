@@ -1,42 +1,23 @@
 #!/bin/sh
 set -eu
 
-vm_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-profile=${1:-reference}
-persistence=${2:-ephemeral}
+dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+profile=${1:-modern}
 
 case "$profile" in
-    reference|modern) ;;
-    *)
-        echo "usage: $0 [reference|modern] [--persist]" >&2
-        exit 2
-        ;;
+	reference|modern) ;;
+	*) echo "usage: $0 [reference|modern]" >&2; exit 2 ;;
 esac
 
-case "$persistence" in
-    ephemeral) snapshot=on ;;
-    --persist) snapshot=off ;;
-    *)
-        echo "usage: $0 [reference|modern] [--persist]" >&2
-        exit 2
-        ;;
-esac
-
-disk="jammy-$profile.qcow2"
-if [ ! -f "$vm_dir/$disk" ]; then
-    docker run --rm --pull=never \
-        --mount "type=bind,src=$vm_dir,dst=/vm" \
-        --workdir /vm \
-        eviction-notice-qemu:local \
-        qemu-img create -f qcow2 -F qcow2 -b jammy-base.img "$disk"
-fi
+disk="$dir/jammy-$profile.qcow2"
+test -f "$disk" || { echo "missing $disk" >&2; exit 1; }
+test -f "$dir/seed.img" || { echo "missing $dir/seed.img" >&2; exit 1; }
+test -c /dev/kvm || { echo "/dev/kvm is unavailable" >&2; exit 1; }
 
 docker run -d --rm --pull=never \
-    --name "eviction-notice-vm-$profile" \
-    --privileged \
-    -p 127.0.0.1:2222:2222 \
-    -e "VM_DISK=/vm/$disk" \
-    -e "VM_SNAPSHOT=$snapshot" \
-    --mount "type=bind,src=$vm_dir,dst=/vm" \
-    eviction-notice-qemu:local \
-    /vm/qemu-start.sh
+	--name "eviction-notice-vm-$profile" \
+	--privileged --security-opt label=disable \
+	-p 127.0.0.1:2222:2222 \
+	-e "VM_DISK=/vm/jammy-$profile.qcow2" \
+	--mount "type=bind,src=$dir,dst=/vm" \
+	eviction-notice-qemu:local /vm/qemu-start.sh

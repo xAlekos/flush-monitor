@@ -1,7 +1,0 @@
-primitive,actual,predicted_0,predicted_1
-upstream,0,97,0
-upstream,1,0,103
-flush,0,97,0
-flush,1,0,103
-dontcache,0,97,0
-dontcache,1,0,103

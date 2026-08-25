@@ -1,0 +1,3 @@
+mode,kernel,status,best_interval_us,n,accuracy,f1,recall,recall_wilson_low95,fpr,fpr_wilson_high95,cleanup_failure_rate,cleanup_wilson_high95,full_cycle_p99_ns,lower_tested_interval_us,lower_n,lower_recall,lower_confirmed
+dontcache,7.2.0-flushmon,confirmed,825,10000,0.996600,0.996569,0.993162,0.990460,0.000000,0.000763,0.000400,0.001028,3469342,800,10000,0.991352,0
+flush,7.2.0-flushmon,confirmed,850,10000,0.998600,0.998590,0.997184,0.995279,0.000000,0.000763,0.000400,0.001028,3506898,825,10000,0.992759,0
