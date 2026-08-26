@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <sys/uio.h>
 #include <time.h>
 #include <unistd.h>
@@ -113,17 +112,14 @@ static int attacker(const char *mode, const char *path)
 	return 0;
 }
 
-static int victim(const char *path, const char *truth_path)
+static int victim(const char *path)
 {
 	size_t size = sysconf(_SC_PAGESIZE);
 	int fd = open(path, O_RDONLY);
-	FILE *truth = fopen(truth_path, "w");
 	void *page = malloc(size);
 	char line[128];
-	if (fd == -1 || !truth || !page)
+	if (fd == -1 || !page)
 		return 1;
-	chmod(truth_path, 0600);
-	fputs("trial_id,event_start_ns,event,error\n", truth);
 	puts("READY");
 
 	while (fgets(line, sizeof(line), stdin)) {
@@ -134,9 +130,6 @@ static int victim(const char *path, const char *truth_path)
 		uint64_t start = now_ns();
 		if (!error && event && pread(fd, page, size, 0) != (ssize_t)size)
 			error = errno ? errno : EIO;
-		fprintf(truth, "%" PRIu64 ",%" PRIu64 ",%d,%d\n",
-			trial, start, event, error);
-		fflush(truth);
 		printf("%" PRIu64 ",%d,%" PRIu64 ",%d\n",
 		       trial, event, start, error);
 	}
@@ -173,11 +166,11 @@ int main(int argc, char **argv)
 	setvbuf(stdout, NULL, _IOLBF, 0);
 	if (argc == 4 && !strcmp(argv[1], "attacker"))
 		return attacker(argv[2], argv[3]);
-	if (argc == 4 && !strcmp(argv[1], "victim"))
-		return victim(argv[2], argv[3]);
+	if (argc == 3 && !strcmp(argv[1], "victim"))
+		return victim(argv[2]);
 	if (argc == 3 && !strcmp(argv[1], "validator"))
 		return validator(argv[2]);
-	fprintf(stderr, "usage: %s attacker MODE FILE | victim FILE CSV | validator FILE\n",
+	fprintf(stderr, "usage: %s attacker MODE FILE | victim FILE | validator FILE\n",
 		argv[0]);
 	return 2;
 }

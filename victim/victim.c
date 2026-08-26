@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 
 	size_t size = (size_t)sysconf(_SC_PAGESIZE);
 	int fd = open(argv[2], O_RDONLY);
-	int log_fd = open(argv[3], O_WRONLY | O_CREAT | O_APPEND, 0600);
+	int log_fd = open(argv[3], O_WRONLY | O_CREAT | O_APPEND, 0666);
 	if (fd == -1 || log_fd == -1) {
 		perror("open");
 		return 1;

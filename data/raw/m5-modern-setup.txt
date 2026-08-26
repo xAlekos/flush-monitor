@@ -1,7 +1,0 @@
-condition=modern
-kernel=7.0.3-arch1-2
-uid=997(m5_attacker) gid=997(m5_attacker) groups=997(m5_attacker)
-uid=996(m5_victim) gid=996(m5_victim) groups=996(m5_victim)
-target_owner=m5_victim:m5_victim target_mode=644 target_size=4096
-truth_owner=m5_victim:m5_victim truth_mode=600
-attacker_ground_truth_readable=no

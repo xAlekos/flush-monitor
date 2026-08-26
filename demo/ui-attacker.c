@@ -62,9 +62,8 @@ int main(void)
 	flush(fd);
 	printf("ATTACKER: victim UI detected after %lu rounds\n", rounds);
 	system("zenity --info --timeout=3 --width=430 "
-	       "--title='ATTACKER OVERLAY — SAFE DEMO' "
-	       "--text='Flush+Monitor detected the victim dialog.\\n\\n"
-	       "This overlay requests and stores no data.' 2>/dev/null");
+	       "--title='ATTACKER OVERLAY' "
+	       "--text='Flush+Monitor detected the victim dialog.' 2>/dev/null");
 	close(fd);
 	return 0;
 }

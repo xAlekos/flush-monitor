@@ -21,9 +21,7 @@ cached, while `EAGAIN` means the read would require I/O.
 
 The basic tests produced 64 cached pages after Read and zero after Flush. A
 second Unix user could repopulate the same pages, and the attacker observed the
-change. The controlled `htop` test likewise changed from zero cached executable
-pages to all 94 pages cached after launch. Evidence is stored under
-`data/raw/m1-*`, `m2-*` and `m3-*`.
+change. Evidence is stored under `data/raw/m1-*` and `m2-*`.
 
 ## Behaviour since Linux 6.12
 
@@ -60,8 +58,8 @@ Raw tables are under `data/raw/m3a-*`.
 ## Controlled attack
 
 The victim owns a one-page target readable by the attacker. `EVENT=0` performs
-no read; `EVENT=1` reads page 0. Ground truth is mode 0600 and is joined with
-attacker output only after acquisition.
+no read; `EVENT=1` reads page 0. The victim event log is joined with the
+attacker output during analysis.
 
 The original 5.15 Monitor and both modern cycles classified all 200 randomized
 50 ms trials correctly. Each condition used the same seeded event sequence.
@@ -71,8 +69,8 @@ The processed result is `data/processed/baseline_metrics.csv`.
 
 The sweep uses persistent attacker, victim and validator processes. Attacker
 and victim are pinned to different vCPUs and follow absolute monotonic
-deadlines. The privileged validator checks only the real pre-event and
-post-cleanup page state; its observations are not sent to the attacker.
+deadlines. The validator records the page state before the event and after
+cleanup.
 
 A window is confirmed with 10,000 trials when accuracy and recall are at least
 99%, false-positive, cleanup-failure and timing-inversion rates are at most 1%,

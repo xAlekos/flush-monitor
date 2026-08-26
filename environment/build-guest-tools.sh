@@ -24,11 +24,10 @@ docker run --rm --pull=never --security-opt label=disable \
             -DMON_PREADV2 $includes "$primitive/monitor/preadv2.c" \
             "$primitive/monitor/monitor.c" $common \
             -o /work/environment/bin/monitor-preadv2
-        for source in /work/environment/*.c; do
-            name=${source##*/}
-            cc -O2 -Wall -Wextra -static "$source" \
-                -o "/work/environment/bin/${name%.c}"
-        done
+		for name in monitor-modern-once window-sweep-worker; do
+			cc -O2 -Wall -Wextra -static "/work/environment/$name.c" \
+				-o "/work/environment/bin/$name"
+		done
         cc -O2 -Wall -Wextra -static /work/demo/hold.c \
             -o /work/environment/bin/hold
     '

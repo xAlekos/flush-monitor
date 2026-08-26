@@ -30,7 +30,6 @@ victim-constant-static: victim.c
 	$(CC) $(CFLAGS) -static -DCONSTANT_ACCESS=1 $< -o $@
 
 clean:
-	rm -f victim victim-constant victim-static victim-constant-static \
-		ground-truth.csv
+	rm -f victim victim-constant victim-static victim-constant-static
 
 .PHONY: all static static-container clean

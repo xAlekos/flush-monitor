@@ -8,7 +8,7 @@ disk="$dir/jammy-$profile.qcow2"
 
 docker run -d --rm --pull=never \
 	--name "eviction-notice-vm-$profile" \
-	--privileged --security-opt label=disable \
+	--device /dev/kvm --security-opt label=disable \
 	-p 127.0.0.1:2222:2222 \
 	-e "VM_DISK=/vm/jammy-$profile.qcow2" \
 	--mount "type=bind,src=$dir,dst=/vm" \

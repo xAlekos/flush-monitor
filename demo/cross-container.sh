@@ -8,7 +8,6 @@ attacker_name=flush-monitor-demo-attacker-$$
 victim_name=flush-monitor-demo-victim-$$
 state=$(mktemp -d /tmp/flush-monitor-cross-container.XXXXXX)
 target="$root/victim/target.bin"
-truth="$state/ground-truth.csv"
 
 cleanup()
 {
@@ -30,23 +29,21 @@ docker build --target victim -t "$victim_image" "$state" >/dev/null 2>&1
 docker build --target attacker -t "$attacker_image" "$state" >/dev/null 2>&1
 sync -f "$target"
 
-common="--rm --network none --read-only --cap-drop ALL"
-docker run -d $common --name "$attacker_name" \
-	--security-opt no-new-privileges --security-opt label=disable \
-	--user 10001:10001 --mount "type=bind,src=$target,dst=/target.bin,readonly" \
+docker run -d --rm --name "$attacker_name" \
+	--security-opt label=disable \
+	--user 10001:10001 --mount "type=bind,src=$target,dst=/target.bin" \
 	"$attacker_image" >/dev/null
-docker run -d $common --name "$victim_name" \
-	--security-opt no-new-privileges --security-opt label=disable \
-	--user "$(id -u):$(id -g)" \
-	--mount "type=bind,src=$target,dst=/target.bin,readonly" \
-	--mount "type=bind,src=$state,dst=/evidence" \
+docker run -d --rm --name "$victim_name" \
+	--security-opt label=disable \
+	--user 10002:10002 \
+	--mount "type=bind,src=$target,dst=/target.bin" \
 	"$victim_image" >/dev/null
 
 inode=$(stat -c '%d:%i' "$target")
 
 echo "CROSS-CONTAINER FLUSH+MONITOR — kernel $(uname -r)"
-echo "ATTACKER: $attacker_name (UID 10001, no network, target read-only)"
-echo "VICTIM:   $victim_name (UID $(id -u), private ground truth)"
+echo "ATTACKER: $attacker_name (UID 10001)"
+echo "VICTIM:   $victim_name (UID 10002)"
 echo "SHARED:   target inode $inode"
 echo
 printf '%-10s %-7s %-12s %-10s\n' POLICY EVENT OBSERVATION RESULT
@@ -62,8 +59,8 @@ for policy in normal constant; do
 			binary=/victim-constant
 			expected=1
 		fi
-		docker exec "$victim_name" "$binary" run /target.bin \
-			/evidence/ground-truth.csv "$trial" "$event" >/dev/null
+		docker exec "$victim_name" "$binary" run /target.bin /dev/null \
+			"$trial" "$event" >/dev/null
 		output=$(docker exec "$attacker_name" \
 			/monitor flush /target.bin)
 		case "$output" in
@@ -81,6 +78,3 @@ done
 
 echo
 echo "Baseline leaks EVENT (miss/hit); constant access is always hit."
-echo "The attacker container never receives the ground-truth mount."
-echo "Victim ground truth:"
-sed 's/^/  /' "$truth"

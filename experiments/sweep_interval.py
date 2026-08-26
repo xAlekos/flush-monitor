@@ -38,16 +38,16 @@ def make_user(name):
         run(["useradd", "--system", "--no-create-home", name])
 
 
-def start(role, mode, truth):
+def start(role, mode):
     if role == "attacker":
         command = ["taskset", "-c", "0", WORKER, role, mode, TARGET]
         user = ATTACKER
     elif role == "victim":
-        command = ["taskset", "-c", "1", WORKER, role, TARGET, truth]
+        command = ["taskset", "-c", "1", WORKER, role, TARGET]
         user = VICTIM
     else:
         command = ["taskset", "-c", "0", WORKER, role, TARGET]
-        user = None
+        user = VICTIM
     if user:
         command = ["sudo", "-u", user, *command]
     process = subprocess.Popen(command, text=True, stdin=subprocess.PIPE,
@@ -71,10 +71,9 @@ def stop(process):
 
 
 def measure(mode, interval, events, kernel):
-    truth = TARGET.parent / f"truth-{mode}-{interval}.csv"
-    attacker = start("attacker", mode, truth)
-    victim = start("victim", mode, truth)
-    validator = start("validator", mode, truth)
+    attacker = start("attacker", mode)
+    victim = start("victim", mode)
+    validator = start("validator", mode)
     raw = OUTPUT / f"m8-{mode}-window-{interval}us-raw.csv"
 
     try:
@@ -112,9 +111,6 @@ def measure(mode, interval, events, kernel):
         stop(validator)
         stop(victim)
         stop(attacker)
-
-    run(["install", "-m", "0644", truth,
-         OUTPUT / f"m8-{mode}-window-{interval}us-ground-truth.csv"])
 
 
 def main():

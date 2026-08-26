@@ -12,8 +12,8 @@ during the observation window?
 Flush page -> victim may read -> Monitor page -> cached means EVENT
 ```
 
-The attacker and victim use different Unix users. They share read access to the
-target inode, but the attacker cannot read the victim's ground truth.
+The attacker and victim use different Unix users and share read access to the
+target inode.
 
 The exam presentation is available as
 [`presentation/flush-monitor.pdf`](presentation/flush-monitor.pdf), with the
@@ -60,9 +60,8 @@ make -C victim static-container
 ./demo/cross-container.sh
 ```
 
-The script runs an attacker and a victim container at the same time. Both have
-no network, no capabilities and a read-only mount of the same target. Only the
-victim receives the ground-truth mount.
+The script runs attacker and victim containers at the same time, under
+different Unix users, sharing the same target.
 
 Expected output:
 
@@ -78,7 +77,7 @@ Containers share the host kernel and page cache, so a shared inode remains a
 shared side channel. This demo uses the modern wait+Flush Monitor because the
 host filesystem is Btrfs; `RWF_DONTCACHE` is not supported there.
 
-The separate UI-redressing demonstration is intentionally small:
+The UI-redressing demo uses two small programs:
 
 ```sh
 cc -O2 demo/ui-attacker.c -o /tmp/ui-attacker
