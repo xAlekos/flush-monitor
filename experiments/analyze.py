@@ -32,17 +32,18 @@ def main():
     metrics = []
 
     for primitive in PRIMITIVES:
-        truth = rows(raw / f"m6-{primitive}-ground-truth.csv", "event")
-        prediction = rows(raw / f"m6-{primitive}-attacker.csv", "prediction")
+        events = rows(raw / f"baseline-{primitive}-events.csv", "event")
+        predictions = rows(raw / f"baseline-{primitive}-predictions.csv",
+                           "prediction")
 
-        tp = sum(truth[i] == 1 and prediction[i] == 1 for i in truth)
-        tn = sum(truth[i] == 0 and prediction[i] == 0 for i in truth)
-        fp = sum(truth[i] == 0 and prediction[i] == 1 for i in truth)
-        fn = sum(truth[i] == 1 and prediction[i] == 0 for i in truth)
-        n = len(truth)
+        tp = sum(events[i] == 1 and predictions[i] == 1 for i in events)
+        tn = sum(events[i] == 0 and predictions[i] == 0 for i in events)
+        fp = sum(events[i] == 0 and predictions[i] == 1 for i in events)
+        fn = sum(events[i] == 1 and predictions[i] == 0 for i in events)
+        n = len(events)
         metrics.append({
             "primitive": primitive,
-            "kernel": kernel(raw / f"m6-{primitive}-setup.txt"),
+            "kernel": kernel(raw / f"baseline-{primitive}-setup.txt"),
             "n": n,
             "tp": tp,
             "tn": tn,

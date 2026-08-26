@@ -21,7 +21,8 @@ cached, while `EAGAIN` means the read would require I/O.
 
 The basic tests produced 64 cached pages after Read and zero after Flush. A
 second Unix user could repopulate the same pages, and the attacker observed the
-change. Evidence is stored under `data/raw/m1-*` and `m2-*`.
+change. Evidence is stored under `data/raw/read-flush-*` and
+`cross-user-*`.
 
 ## Behaviour since Linux 6.12
 
@@ -53,7 +54,7 @@ The earlier isolated timing campaign used 10,000 hits and 10,000 misses:
 | hit | modern wait+Flush | 0.814 µs |
 | hit | modern `RWF_DONTCACHE` | 0.820 µs |
 
-Raw tables are under `data/raw/m3a-*`.
+Raw tables are under `data/raw/monitor-timing-*`.
 
 ## Controlled attack
 
@@ -83,7 +84,7 @@ and the corresponding 95% Wilson bounds meet the same limits.
 
 These are end-to-end VM timings including victim I/O and scheduling. They are
 not directly comparable with the paper's approximately 0.8 µs Flush-limited
-primitive timing. Full results are in `data/processed/m8-*`.
+primitive timing. Full results are in `data/processed/window-sweep-*`.
 
 The one-page target stays in `victim/` and `make clean` leaves it untouched.
 

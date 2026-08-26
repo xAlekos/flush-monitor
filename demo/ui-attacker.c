@@ -34,7 +34,7 @@ int main(void)
 	}
 
 	puts("ATTACKER: monitoring /usr/bin/zenity (1 ms window)");
-	puts("ATTACKER: start ./ui-victim in another terminal");
+	puts("ATTACKER: start /tmp/ui-victim in another terminal");
 	for (;;) {
 		if (flush(fd)) {
 			perror("flush");

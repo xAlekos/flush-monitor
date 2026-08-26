@@ -84,7 +84,24 @@ cc -O2 demo/ui-attacker.c -o /tmp/ui-attacker
 cc -O2 demo/ui-victim.c -o /tmp/ui-victim
 ```
 
-It requires Zenity. Run the attacker first and the victim in another terminal.
+It requires Zenity at `/usr/bin/zenity` and a graphical desktop session. Start
+the monitor in one terminal:
+
+```sh
+/tmp/ui-attacker
+```
+
+After it prints `monitoring /usr/bin/zenity`, launch the victim from another
+terminal:
+
+```sh
+/tmp/ui-victim
+```
+
+The victim dialog remains visible for five seconds. Its launch brings the
+monitored Zenity page into cache, which triggers the attacker overlay. No root,
+Docker or VM is required. Any other Zenity launch during monitoring can also
+trigger the overlay.
 
 ## Fixed VMs
 
@@ -151,8 +168,8 @@ python3 experiments/benchmark_victim.py TARGET NORMAL CONSTANT 100000 9109 RAW_D
   within measurement noise.
 
 The compact outputs are `data/processed/baseline_metrics.csv`,
-`m8-best-window.csv`, `m9-security-metrics.csv` and
-`m9-victim-overhead.csv`. Methodology and caveats are in
+`window-sweep-minima.csv`, `mitigation-security-metrics.csv` and
+`mitigation-victim-overhead.csv`. Methodology and caveats are in
 `notes/experiment.md`.
 
 ## Limits

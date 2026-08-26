@@ -1,9 +1,9 @@
-M2 run 3
+Cross-user run 3
 Attacker UID: 1000
 Victim UID: 65534
-Target: data/m1-target.bin (64 x 4096 bytes, Btrfs, mode 0644)
+Target: data/page-cache-target.bin (64 x 4096 bytes, Btrfs, mode 0644)
 
-$ artifact/Eviction-Notice/primitives/build/flush data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/flush data/page-cache-target.bin -1
 page, time [s],  cache
 0000, 0.000005899, 1
 0001, 0.000001178, 1
@@ -72,7 +72,7 @@ page, time [s],  cache
 
 exit=0
 
-$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/page-cache-target.bin -1
 page, cache
 0000,   0
 0001,   0
@@ -144,11 +144,11 @@ In cache: 0
 
 exit=0
 
-$ docker run --rm --pull=never --network=none --user 65534:65534 --mount type=bind,src=/home/bantinus/Progetti/evictionNotice/data/m1-target.bin,dst=/target,readonly ubuntu:24.04 dd if=/target of=/dev/null bs=4096 status=none
+$ docker run --rm --pull=never --network=none --user 65534:65534 --mount type=bind,src=/home/bantinus/Progetti/evictionNotice/data/page-cache-target.bin,dst=/target,readonly ubuntu:24.04 dd if=/target of=/dev/null bs=4096 status=none
 
 exit=0
 
-$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/page-cache-target.bin -1
 page, cache
 0000,   1
 0001,   1

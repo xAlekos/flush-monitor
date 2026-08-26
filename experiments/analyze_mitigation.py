@@ -66,12 +66,12 @@ def security(raw):
     output = []
     for policy in ("normal", "constant"):
         for primitive in ("flush", "dontcache"):
-            name = f"m9-{policy}-{primitive}"
-            truth = {row["trial_id"]: int(row["event"])
-                     for row in rows(raw / f"{name}-ground-truth.csv")}
+            name = f"mitigation-{policy}-{primitive}"
+            events = {row["trial_id"]: int(row["event"])
+                      for row in rows(raw / f"{name}-events.csv")}
             guesses = {row["trial_id"]: int(row["prediction"])
-                       for row in rows(raw / f"{name}-attacker.csv")}
-            pairs = [(event, guesses[trial]) for trial, event in truth.items()]
+                       for row in rows(raw / f"{name}-predictions.csv")}
+            pairs = [(event, guesses[trial]) for trial, event in events.items()]
             tp = sum(event and guess for event, guess in pairs)
             tn = sum(not event and not guess for event, guess in pairs)
             fp = sum(not event and guess for event, guess in pairs)
@@ -94,7 +94,7 @@ def security(raw):
 
 
 def performance(raw):
-    data = rows(raw / "m9-victim-performance-raw.csv")
+    data = rows(raw / "mitigation-victim-performance-raw.csv")
     output, grouped = [], {}
     for policy in ("normal", "constant"):
         selected = [row for row in data if row["policy"] == policy]
@@ -122,9 +122,9 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     metrics = security(raw)
     timings, overhead = performance(raw)
-    save(output / "m9-security-metrics.csv", metrics)
-    save(output / "m9-victim-performance.csv", timings)
-    save(output / "m9-victim-overhead.csv", overhead)
+    save(output / "mitigation-security-metrics.csv", metrics)
+    save(output / "mitigation-victim-performance.csv", timings)
+    save(output / "mitigation-victim-overhead.csv", overhead)
     for row in metrics:
         print(row["policy"], row["primitive"],
               f"accuracy={row['accuracy']:.3f}",

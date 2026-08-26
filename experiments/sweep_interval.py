@@ -74,7 +74,7 @@ def measure(mode, interval, events, kernel):
     attacker = start("attacker", mode)
     victim = start("victim", mode)
     validator = start("validator", mode)
-    raw = OUTPUT / f"m8-{mode}-window-{interval}us-raw.csv"
+    raw = OUTPUT / f"window-sweep-{mode}-{interval}us.csv"
 
     try:
         with raw.open("w", newline="") as file:
@@ -134,7 +134,8 @@ def main():
         measure(mode, interval, events, kernel)
         print(mode, f"window={interval} us", f"trials={count}")
 
-    setup = OUTPUT / f"m8-{mode}-setup-{intervals[0]}-{intervals[-1]}us.txt"
+    setup = OUTPUT / (f"window-sweep-{mode}-setup-"
+                      f"{intervals[0]}-{intervals[-1]}us.txt")
     setup.write_text(
         f"mode={mode}\nkernel={kernel}\ntrials_per_interval={count}\n"
         f"seed={seed}\nintervals_us={','.join(map(str, intervals))}\n"

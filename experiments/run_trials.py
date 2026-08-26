@@ -38,13 +38,13 @@ def main():
                  "[normal|constant]")
     primitive, count, seed = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
     policy = sys.argv[4] if len(sys.argv) == 5 else "normal"
-    campaign = "m9" if len(sys.argv) == 5 else "m6"
-    name = (f"{campaign}-{policy}-{primitive}" if campaign == "m9"
-            else f"m6-{primitive}")
+    mitigation = len(sys.argv) == 5
+    name = (f"mitigation-{policy}-{primitive}" if mitigation
+            else f"baseline-{primitive}")
     directory = Path("/var/tmp") / name
     target = directory / "target.bin"
-    truth = directory / "ground-truth.csv"
-    attacker_log = directory / "attacker.csv"
+    event_log = directory / "events.csv"
+    prediction_log = directory / "predictions.csv"
     victim = ("/tmp/victim-constant-static" if policy == "constant"
               else "/tmp/victim-static")
 
@@ -55,14 +55,14 @@ def main():
     run(["install", "-m", "0644", "-o", VICTIM, "-g", VICTIM,
          "/tmp/target.bin", target])
     run(["sync", "-f", target])
-    truth.unlink(missing_ok=True)
+    event_log.unlink(missing_ok=True)
     run(["install", "-m", "0644", "-o", ATTACKER, "-g", ATTACKER,
-         "/dev/null", attacker_log])
-    log = attacker_log.open("w")
+         "/dev/null", prediction_log])
+    log = prediction_log.open("w")
     log.write("trial_id,timestamp_ns,prediction\n")
 
     randomizer = random.Random(seed)
-    if campaign == "m9":
+    if mitigation:
         events = [i % 2 for i in range(count)]
         randomizer.shuffle(events)
     else:
@@ -71,7 +71,7 @@ def main():
     for trial, event in enumerate(events, 1):
         run(["/tmp/flush", target, "0"], ATTACKER)
         deadline = time.monotonic_ns() + WINDOW_NS
-        run([victim, "run", target, truth, str(trial), str(event)], VICTIM)
+        run([victim, "run", target, event_log, str(trial), str(event)], VICTIM)
         time.sleep(max(0, deadline - time.monotonic_ns()) / 1e9)
         if primitive == "upstream":
             monitor = ["/tmp/monitor-preadv2", target, "0"]
@@ -82,8 +82,9 @@ def main():
     log.close()
 
     prefix = Path("/tmp") / name
-    run(["install", "-m", "0644", attacker_log, f"{prefix}-attacker.csv"])
-    run(["install", "-m", "0644", truth, f"{prefix}-ground-truth.csv"])
+    run(["install", "-m", "0644", prediction_log,
+         f"{prefix}-predictions.csv"])
+    run(["install", "-m", "0644", event_log, f"{prefix}-events.csv"])
     Path(f"{prefix}-setup.txt").write_text(
         f"primitive={primitive}\naccess_policy={policy}\n"
         f"kernel={os.uname().release}\ntrials={count}\nseed={seed}\n"

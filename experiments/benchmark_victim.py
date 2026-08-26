@@ -45,7 +45,7 @@ def main():
             for policy, binary in binaries.items()
         }
 
-    raw = output / "m9-victim-performance-raw.csv"
+    raw = output / "mitigation-victim-performance-raw.csv"
     with raw.open("w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(("policy", "trial_id", "event", "duration_ns"))
@@ -55,7 +55,7 @@ def main():
                     policy, row["trial_id"], row["event"], row["duration_ns"]
                 ))
 
-    (output / "m9-victim-performance-setup.txt").write_text(
+    (output / "mitigation-victim-performance-setup.txt").write_text(
         f"kernel={os.uname().release}\n"
         f"trials_per_policy={count}\n"
         f"seed={seed}\n"

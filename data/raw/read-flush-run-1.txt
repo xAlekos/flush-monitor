@@ -1,7 +1,7 @@
-M1 run 1
-Target: data/m1-target.bin (64 x 4096 bytes, Btrfs)
+Read / Flush run 1
+Target: data/page-cache-target.bin (64 x 4096 bytes, Btrfs)
 
-$ artifact/Eviction-Notice/primitives/build/read data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/read data/page-cache-target.bin -1
 page, time [s]
 0000, 0.000002629
 0001, 0.000000475
@@ -70,7 +70,7 @@ page, time [s]
 
 exit=0
 
-$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/page-cache-target.bin -1
 page, cache
 0000,   1
 0001,   1
@@ -142,7 +142,7 @@ In cache: 64
 
 exit=0
 
-$ artifact/Eviction-Notice/primitives/build/flush data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/flush data/page-cache-target.bin -1
 page, time [s],  cache
 0000, 0.000004795, 1
 0001, 0.000000958, 1
@@ -211,7 +211,7 @@ page, time [s],  cache
 
 exit=0
 
-$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/m1-target.bin -1
+$ artifact/Eviction-Notice/primitives/build/monitor-preadv2 data/page-cache-target.bin -1
 page, cache
 0000,   0
 0001,   0

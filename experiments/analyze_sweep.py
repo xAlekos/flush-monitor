@@ -129,9 +129,9 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     plots.mkdir(parents=True, exist_ok=True)
     summaries = [summarize(read(path)) for path in
-                 sorted(raw.glob("m8-*-window-*us-raw.csv"))]
+                 sorted(raw.glob("window-sweep-*-*us.csv"))]
     summaries.sort(key=lambda row: (row["mode"], row["interval_us"]))
-    save(output / "m8-sweep-metrics.csv", summaries)
+    save(output / "window-sweep-metrics.csv", summaries)
 
     best = []
     for mode in ("dontcache", "flush"):
@@ -156,8 +156,8 @@ def main():
             "lower_n": lower["n"], "lower_recall": lower["recall"],
             "lower_confirmed": lower["confirmed"],
         })
-    save(output / "m8-best-window.csv", best)
-    plot(plots / "m8-f1-vs-window.svg", summaries)
+    save(output / "window-sweep-minima.csv", best)
+    plot(plots / "window-sweep-f1-vs-window.svg", summaries)
     for row in best:
         print(row["mode"], f"best_window={row['best_interval_us']} us")
 

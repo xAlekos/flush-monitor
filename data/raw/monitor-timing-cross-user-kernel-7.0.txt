@@ -1,7 +1,7 @@
 7.0.3-arch1-2
-uid=997(m3a_attacker) gid=997(m3a_attacker) groups=997(m3a_attacker)
-uid=996(m3a_victim) gid=996(m3a_victim) groups=996(m3a_victim)
-target=/var/tmp/m3a-crossuid/target.bin owner=m3a_victim:m3a_victim mode=644 size=4096
+uid=997(monitor_attacker) gid=997(monitor_attacker) groups=997(monitor_attacker)
+uid=996(monitor_victim) gid=996(monitor_victim) groups=996(monitor_victim)
+target=/var/tmp/monitor-cross-user/target.bin owner=monitor_victim:monitor_victim mode=644 size=4096
 
 mode=flush state=miss trial=1
 after-attacker-flush validator_uid=996 cache=0
