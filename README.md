@@ -80,12 +80,13 @@ host filesystem is Btrfs; `RWF_DONTCACHE` is not supported there.
 The UI-redressing demo uses two small programs:
 
 ```sh
-cc -O2 demo/ui-attacker.c -o /tmp/ui-attacker
-cc -O2 demo/ui-victim.c -o /tmp/ui-victim
+cc -O2 -Wall -Wextra demo/ui-attacker.c -o /tmp/ui-attacker \
+    $(pkg-config --cflags --libs x11)
+cc -O2 -Wall -Wextra demo/ui-victim.c -o /tmp/ui-victim
 ```
 
-It requires Zenity at `/usr/bin/zenity` and a graphical desktop session. Start
-the monitor in one terminal:
+It requires Zenity at `/usr/bin/zenity`, Xlib development files and an X11 or
+XWayland graphical session. Start the monitor in one terminal:
 
 ```sh
 /tmp/ui-attacker
@@ -99,9 +100,10 @@ terminal:
 ```
 
 The victim dialog remains visible for five seconds. Its launch brings the
-monitored Zenity page into cache, which triggers the attacker overlay. No root,
-Docker or VM is required. Any other Zenity launch during monitoring can also
-trigger the overlay.
+monitored Zenity page into cache, which triggers a three-second X11 overlay
+above the victim window. The overlay does not execute Zenity, so it cannot
+trigger the Monitor itself. No root, Docker or VM is required. Any unrelated
+Zenity launch during monitoring can still trigger the overlay.
 
 ## Fixed VMs
 
